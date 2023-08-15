@@ -21,6 +21,8 @@ import glob
 # .envファイルから環境変数をロード
 # load_dotenv()
 app = Flask(__name__)
+line_bot_api = LineBotApi(os.getenv('YOUR_CHANNEL_ACCESS_TOKEN'))
+handler = WebhookHandler(os.getenv('YOUR_CHANNEL_SECRET'))
 
 @app.route('/')
 def hello_world():
@@ -45,8 +47,26 @@ def read_pdf(filename):
 
 
 
-@app.route('/callback')
+@app.route("/callback", methods=['POST'])
 def callback():
+    print('その２')
+    # get X-Line-Signature header value
+    signature = request.headers['X-Line-Signature']
+
+    # get request body as text
+    body = request.get_data(as_text=True)
+    app.logger.info("Request body: " + body)
+
+    # handle webhook body
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        abort(400)
+
+    return 'OK'
+
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
     # 各PDFの全ページからデータを取得
     pages_contents = ''
     for filename in pdf_files:
@@ -90,8 +110,9 @@ def callback():
     # query = "共有フォルダーのデータを誤って消去しないためにはどうすればいい？"
     # query = "所有者とアクセス許可設定を元に戻すは何ページ目ですか？"
     # query = "Active Directoryドメインユーザーの共有フォルダーへのアクセスを制限するにはどうすればいいですか？"
-    query = "違反行為に対する抑止力の強化に関して何が改正されましたか？"
     # query = "明日の天気はなんだと思いますか？情報を元に答えてください。"
+    # query = "違反行為に対する抑止力の強化に関して何が改正されましたか？"
+    query = event.message.text
     query += "仮に判断できない場合は『該当する情報が見つかりませんでした。』と回答してください。"
 
     embedding_vector = embeddings.embed_query(query)
@@ -107,23 +128,20 @@ def callback():
     print(query)
     print('に対する回答は以下の通りです。')
     print(message)
-    return message
-    # sys.exit()
-    # ここまで
 
 
 
 
 
-    # print('その３~4')
+    print('その３~4')
     # LINE bot => おうむ返し
     # message = event.message.text
     # message = 'るべき事実を把握することができない期間における売上額を推計することができる規定の整備、違反行為から遡り10年以内に課徴金納付命令を受けたことがある事業者に対し、課徴金の額を加算（1.5倍）する規定の新設、優良誤認表示・有利誤認表示に対し、直罰（100万円以下の罰金）の新設が改正されました。'
-    # line_bot_api.reply_message(
-    #     event.reply_token,
-    #     TextSendMessage(text=message)
-    #     )
-    # ここまで１段下げる
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=message)
+        )
+    return message
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
