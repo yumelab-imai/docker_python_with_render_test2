@@ -2,7 +2,7 @@
 from flask import Flask, jsonify, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, FileMessage
 import requests
 import textract
 from pypdf import PdfReader
@@ -65,6 +65,21 @@ def callback():
 
     return 'OK'
 
+
+@handler.add(MessageEvent, message=FileMessage)
+def handle_file_message(event):
+    # ファイルの内容を取得
+    message_content = line_bot_api.get_message_content(event.message.id)
+    file_path = "pdf_list/" + event.message.file_name
+    
+    with open(file_path, 'wb') as file:
+        for chunk in message_content.iter_content():
+            file.write(chunk)
+
+    # ユーザーにメッセージを送信して、PDFが保存されたことを知らせる
+    reply_message = "PDFを保存しました。"
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_message))
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     # 各PDFの全ページからデータを取得
@@ -75,7 +90,7 @@ def handle_message(event):
 
     chunks = pages_contents
     print('URLのPDF群から情報を抽出しました。')
-    print(chunks)
+    # print(chunks)
 
     text = chunks
 
