@@ -1,13 +1,12 @@
 services:
     # コンテナ名
-    jupyterlab:
+    dev-app:
         build: .
-        image: jupyterlab-test-img
-        container_name: dev-app
+        image: dev-app-img
+        container_name: dev-app-container
         working_dir: /app
         volumes:
             - ./app:/app
         ports:
-            - "6666:6666"
-        command:
-            jupyter-lab --ip 0.0.0.0 --allow-root -b localhost
+            - "80:80"
+        command: gunicorn main:app --bind 0.0.0.0:80

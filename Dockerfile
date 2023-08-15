@@ -9,3 +9,21 @@ RUN pip install --upgrade pip
 # RUN pip install requests
 # RUN pip install selenium
 # RUN pip install beautifulsoup4
+# RUN python -m pip install jupyterlab
+
+RUN pip install python-dotenv
+RUN pip install Flask
+RUN pip install line-bot-sdk
+RUN pip install requests
+RUN pip install textract
+RUN pip install pypdf
+RUN pip install transformers
+RUN pip install langchain
+RUN pip install gunicorn
+RUN pip install openai
+RUN pip install tiktoken
+RUN pip install faiss-cpu
+# RUN pip install data
+RUN pip install torch
+RUN pip install tensorflow
+
