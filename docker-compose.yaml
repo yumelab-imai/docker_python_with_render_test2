@@ -1,9 +1,9 @@
 services:
     # コンテナ名
-    dev-app:
+    dev-app2:
         build: .
-        image: dev-app-img
-        container_name: dev-app-container
+        image: dev-app-img2
+        container_name: dev-app-container2
         working_dir: /app
         volumes:
             - ./app:/app
