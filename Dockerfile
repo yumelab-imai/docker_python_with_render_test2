@@ -27,3 +27,14 @@ RUN pip install faiss-cpu
 RUN pip install torch
 RUN pip install tensorflow
 
+# ワーキングディレクトリの指定
+WORKDIR /app
+
+# ソースコードのコピー
+COPY ./app /app
+
+# ポートの露出
+EXPOSE 80
+
+# エントリーポイントの指定
+CMD ["gunicorn", "main:app", "--bind", "0.0.0.0:80"]
