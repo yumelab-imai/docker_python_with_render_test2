@@ -30,6 +30,19 @@ def hello_world():
 
 pdf_files = glob.glob("pdf_list/*.pdf")
 
+# PDFの読み込みを行う関数
+def read_pdf(filename):
+    with open(filename, 'rb') as file:
+        page_contents = ''
+        reader = PdfReader(filename)
+        number_of_pages = len(reader.pages)
+        page_contents = ""
+        for page_number in range(number_of_pages):
+            pages = reader.pages
+            page_contents += pages[page_number].extract_text()
+
+        return page_contents
+
 
 
 @app.route('/callback')
