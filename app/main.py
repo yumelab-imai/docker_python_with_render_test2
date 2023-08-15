@@ -16,8 +16,7 @@ from langchain.chains import ConversationalRetrievalChain
 from dotenv import load_dotenv
 import os
 import sys
-from data import pdf_urls
-# import glob
+import glob
 
 # .envファイルから環境変数をロード
 load_dotenv()
@@ -28,14 +27,16 @@ def hello_world():
     return 'Hello, World!!!!!!'
 
 # PDFのダウンロードと保存を行う関数
-def download_and_save_pdf(url, filename):
-    response = requests.get(url)
-    if response.status_code == 200:
-        with open(filename, 'wb') as file:
-            file.write(response.content)
-    else:
-        print("Error: Unable to download the PDF file. The URL might be incorrect. Status code:", response.status_code)
-        # sys.exit()
+# def download_and_save_pdf(url, filename):
+#     response = requests.get(url)
+#     if response.status_code == 200:
+#         with open(filename, 'wb') as file:
+#             file.write(response.content)
+#     else:
+#         print("Error: Unable to download the PDF file. The URL might be incorrect. Status code:", response.status_code)
+#         # sys.exit()
+
+pdf_files = glob.glob("pdf_list/*.pdf")
 
 # PDFの読み込みを行う関数
 def read_pdf(filename):
@@ -56,10 +57,7 @@ def read_pdf(filename):
 def callback():
     # 各PDFの全ページからデータを取得
     pages_contents = ''
-    for i, url in enumerate(pdf_urls):
-        # PDFをダウンロードして保存
-        filename = f'sample_document{i+1}.pdf'
-        download_and_save_pdf(url, filename)
+    for filename in pdf_files:
         # PDFを読み込み
         pages_contents += read_pdf(filename)
 
